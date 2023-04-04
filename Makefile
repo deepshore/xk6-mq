@@ -3,7 +3,7 @@
 RDURL ?= https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist
 RDTAR ?= IBM-MQC-Redist-LinuxX64.tar.gz
 VRMF ?= 9.3.2.0
-MQ_INSTALL_PATH ?= $(shell pwd)/mqm
+MQ_INSTALL_PATH ?= /opt/mqm
 
 all: clean format build-deps build
 
