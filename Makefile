@@ -5,7 +5,7 @@ RDTAR ?= IBM-MQC-Redist-LinuxX64.tar.gz
 VRMF ?= 9.3.2.0
 MQ_INSTALL_PATH ?= $(shell pwd)/mqm
 
-all: clean format test build-deps build
+all: clean format build-deps test build
 
 ## help: Prints a list of available build targets.
 help:
