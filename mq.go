@@ -85,6 +85,33 @@ func (mq *MQ) Start() error {
 }
 
 // Publish delivers the payload using options provided.
+func (mq *MQ) Putter(fileName string) error {
+	log.Info("mq put")
+
+	// The PUT requires control structures, the Message Descriptor (MQMD)
+	// and Put Options (MQPMO). Create those with default values.
+	putmqmd := ibmmq.NewMQMD()
+	pmo := ibmmq.NewMQPMO()
+
+	// The default options are OK, but it's always
+	// a good idea to be explicit about transactional boundaries as
+	// not all platforms behave the same way.
+	pmo.Options = ibmmq.MQPMO_NO_SYNCPOINT
+
+	// The message is always sent as bytes, so has to be converted before the PUT.
+	buffer, err := os.ReadFile(fileName)
+
+	if err != nil {
+		return err
+	}
+
+	// Now put the message to the queue
+	err = mq.qObject.Put(putmqmd, pmo, buffer)
+
+	return err
+}
+
+// Publish delivers the payload using options provided.
 func (mq *MQ) Put() error {
 	log.Info("mq put")
 
@@ -127,7 +154,7 @@ func close(mq *MQ) error {
 func init() {
 	generalMQ := MQ{
 		qMgrName:  "mq",
-		qName:     "DEV.QUEUE.1",
+		qName:     "mip.mcc.de.invoice_archiving.to_app",
 		mqHost:    "localhost",
 		mqPort:    1414,
 		mqChannel: "DEV.APP.SVRCONN",
