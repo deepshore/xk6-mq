@@ -2,17 +2,23 @@
 package mq
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/ibm-messaging/mq-golang/v5/ibmmq"
+	log "github.com/sirupsen/logrus"
 	"go.k6.io/k6/js/modules"
 )
 
-const version = "v0.3.0"
+const version = "v0.1.0"
 
 // MQ type holds connection to a remote MQ Broker.
 type MQ struct {
+	mqHost     string
+	mqPort     int
+	mqChannel  string
 	qMgrName   string
 	qName      string
 	qMgrObject *ibmmq.MQQueueManager
@@ -20,13 +26,40 @@ type MQ struct {
 }
 
 // Options defines configuration options for a MQ Connection.
-type PutOptions struct {
-	option1 string
-}
-
 // Start establishes a session with a MQ Broker given the provided options.
 func (mq *MQ) Start() error {
-	qMgrObject, err := ibmmq.Conn(mq.qMgrName)
+	os.Setenv("MQSERVER", fmt.Sprintf("%s/TCP/%s(%d)", mq.mqChannel, mq.mqHost, mq.mqPort))
+	os.Setenv("MQ_CONNECT_TYPE", "Client")
+	log.Info(fmt.Sprintf("MQ Host set to %s", os.Getenv("MQSERVER")))
+	log.Info(fmt.Sprintf("Connecting to Queue %s on qmgr %s.", mq.qName, mq.qMgrName))
+
+	// Allocate the MQCNO and MQCD structures needed for the CONNX call.
+	cno := ibmmq.NewMQCNO()
+	cd := ibmmq.NewMQCD()
+
+	cd.ChannelName = mq.mqChannel
+	cd.ConnectionName = fmt.Sprintf("%s(%d)", mq.mqHost, mq.mqPort)
+
+	cno.ClientConn = cd
+	cno.Options = ibmmq.MQCNO_CLIENT_BINDING
+
+	cno.ApplName = "xk6-mq"
+
+	csp := ibmmq.NewMQCSP()
+	csp.AuthenticationType = ibmmq.MQCSP_AUTH_USER_ID_AND_PWD
+	csp.UserId = "app"
+	csp.Password = "passw0rd"
+
+	cno.SecurityParms = csp
+
+	b, err := json.Marshal(cno)
+	if err != nil {
+		return err
+	}
+
+	log.Info(string(b))
+
+	qMgrObject, err := ibmmq.Connx(mq.qMgrName, cno)
 	mq.qMgrObject = &qMgrObject
 
 	if err != nil {
@@ -52,7 +85,8 @@ func (mq *MQ) Start() error {
 }
 
 // Publish delivers the payload using options provided.
-func (mq *MQ) Put(options PutOptions) error {
+func (mq *MQ) Put() error {
+	log.Info("mq put")
 
 	// The PUT requires control structures, the Message Descriptor (MQMD)
 	// and Put Options (MQPMO). Create those with default values.
@@ -92,9 +126,13 @@ func close(mq *MQ) error {
 
 func init() {
 	generalMQ := MQ{
-		qMgrName: "QM1",
-		qName:    "DEV.QUEUE.1",
+		qMgrName:  "mq",
+		qName:     "DEV.QUEUE.1",
+		mqHost:    "localhost",
+		mqPort:    1414,
+		mqChannel: "DEV.APP.SVRCONN",
 	}
+	log.Info("registering k6/x/mq")
 
 	modules.Register("k6/x/mq", &generalMQ)
 }
