@@ -22,7 +22,7 @@ jobs:
       run: make && zip --junk-paths k6.zip k6
     - name: move mqm libs for dockerbuild context
       run: mv /opt/mqm .
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: k6.zip
         path: k6.zip
