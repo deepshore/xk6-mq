@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/ibm-messaging/mq-golang/v5/ibmmq"
@@ -153,13 +154,30 @@ func close(mq *MQ) error {
 
 func init() {
 	generalMQ := MQ{
-		qMgrName:  "mq",
-		qName:     "mip.mcc.de.invoice_archiving.to_app",
-		mqHost:    "localhost",
-		mqPort:    1414,
-		mqChannel: "DEV.APP.SVRCONN",
+		qMgrName:  getenv("QMGR_NAME", "qm1"),
+		qName:     getenv("Q_NAME", "DEV.APP.QUEUE1"),
+		mqHost:    getenv("Q_HOST", "localhost"),
+		mqPort:    getEnvAsInt("Q_PORT", 1414),
+		mqChannel: getenv("Q_CHANNEL", "DEV.APP.SVRCONN"),
 	}
 	log.Info("registering k6/x/mq")
 
 	modules.Register("k6/x/mq", &generalMQ)
+}
+
+func getenv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return fallback
+	}
+	return value
+}
+
+func getEnvAsInt(key string, defaultValue int) int {
+	if valueStr, exists := os.LookupEnv(key); exists {
+		if value, err := strconv.Atoi(valueStr); err == nil {
+			return value
+		}
+	}
+	return defaultValue
 }
