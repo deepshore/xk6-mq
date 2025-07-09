@@ -4,7 +4,8 @@ RDURL ?= https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messagin
 RDTAR ?= IBM-MQC-Redist-LinuxX64.tar.gz
 VRMF ?= 9.4.3.0
 BUILD_ARCH ?= 
-export MQ_INSTALL_PATH = /opt/mqm
+MQ_INSTALL_PATH ?= /opt/mqm
+
 export MQ_REDIST_INSTALL_PATH = $(shell pwd)/mqm_redist
 export GOCACHE=/tmp/.gocache
 export MQ_INSTALLATION_PATH = /opt/mqm
@@ -49,10 +50,10 @@ build:
 	CGO_ENABLED=1 \
 	CGO_LDFLAGS="-L${MQ_INSTALL_PATH}/lib64 -Wl,-rpath,${MQ_INSTALL_PATH}/lib64" \
 	CGO_CFLAGS="-I${MQ_INSTALL_PATH}/inc" \
-	xk6 --arch arm64 build -v --with $(shell go list -m)=.
+	xk6 build -v --with $(shell go list -m)=.
 ## format: Applies Go formatting to code.
 format:
-	go fmt ./...
+	go fmt .
 
 integration-test:
 	./k6 run examples/mqput.js
