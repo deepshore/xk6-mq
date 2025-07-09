@@ -46,7 +46,7 @@ build-mq:
 build:
 	go install go.k6.io/xk6/cmd/xk6@latest && \
 	CGO_ENABLED=1 \
-	GO_ARCH=amd64 \
+	CGO_ARCH=amd64 \
 	CGO_LDFLAGS="-L${MQ_INSTALL_PATH}/lib64 -Wl,-rpath,${MQ_INSTALL_PATH}/lib64" \
 	CGO_CFLAGS="-I${MQ_INSTALL_PATH}/inc" \
 	xk6 build -v --with $(shell go list -m)=.
