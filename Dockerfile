@@ -1,4 +1,4 @@
-FROM --platform=arm64 grafana/k6
+FROM grafana/k6
 #ARG MQ_INSTALL_PATH="/opt/mqm"
 
 COPY ./k6 /usr/bin/k6
