@@ -48,8 +48,8 @@ func (mq *MQ) Start() error {
 
 	csp := ibmmq.NewMQCSP()
 	csp.AuthenticationType = ibmmq.MQCSP_AUTH_USER_ID_AND_PWD
-	csp.UserId = "app"
-	csp.Password = "passw0rd"
+	csp.UserId = getenv("Q_USERNAME", "app")
+	csp.Password = getenv("Q_PASSWORD", "passw0rd")
 
 	cno.SecurityParms = csp
 
