@@ -1,11 +1,8 @@
 import Mq from 'k6/x/mq';
 
+Mq.start()
 
 export default function () {
-    const url = "amqp://guest:guest@localhost:5672/"
-    Mq.start()
-    //Mq.put()
-    Mq.putter("./examples/test.zip")
-  
-  }
+    Mq.putter("./examples/test.zip")  
+}
   

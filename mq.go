@@ -143,7 +143,7 @@ func (mq *MQ) Put() error {
 
 // Disconnect from the queue manager
 func close(mq *MQ) error {
-	err := close(mq)
+	err := mq.qMgrObject.Disc()
 	if err == nil {
 		fmt.Printf("Disconnected from queue manager %s\n", mq.qObject.Name)
 	} else {
@@ -155,7 +155,7 @@ func close(mq *MQ) error {
 func init() {
 	generalMQ := MQ{
 		qMgrName:  getenv("QMGR_NAME", "qm1"),
-		qName:     getenv("Q_NAME", "DEV.APP.QUEUE1"),
+		qName:     getenv("Q_NAME", "DEV.QUEUE.1"),
 		mqHost:    getenv("Q_HOST", "localhost"),
 		mqPort:    getEnvAsInt("Q_PORT", 1414),
 		mqChannel: getenv("Q_CHANNEL", "DEV.APP.SVRCONN"),

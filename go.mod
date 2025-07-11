@@ -4,6 +4,7 @@ go 1.24
 
 require (
 	github.com/ibm-messaging/mq-golang/v5 v5.6.4
+	github.com/sirupsen/logrus v1.9.3
 	go.k6.io/k6 v1.0.0
 )
 
@@ -27,7 +28,6 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.27.5 // indirect
 	github.com/serenize/snaker v0.0.0-20201027110005-a7ad2135616e // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/afero v1.1.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel v1.35.0 // indirect

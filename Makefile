@@ -34,7 +34,8 @@ build-deps:
  	&& cd $(MQ_REDIST_INSTALL_PATH) \
  	&& curl -LO "$(RDURL)/$(VRMF)-$(RDTAR)" \
  	&& tar -zxf ./*.tar.gz \
- 	&& rm -f ./*.tar.gz
+ 	&& rm -f ./*.tar.gz \
+	&& go install go.k6.io/xk6/cmd/xk6@v1.0.0
 
 build-mq:
 	genmqpkg_incnls=1 \
@@ -44,11 +45,10 @@ build-mq:
 
 ## build: Builds a custom 'k6' with the local extension. 
 build:
-	go install go.k6.io/xk6/cmd/xk6@latest && \
 	CGO_ENABLED=1 \
 	CGO_LDFLAGS="-L${MQ_INSTALL_PATH}/lib64 -Wl,-rpath,${MQ_INSTALL_PATH}/lib64" \
 	CGO_CFLAGS="-I${MQ_INSTALL_PATH}/inc" \
-	xk6 build -v --with $(shell go list -m)=.
+	xk6 build -v --skip-cleanup --with $(shell go list -m)=. --k6-version v1.0.0
 ## format: Applies Go formatting to code.
 format:
 	go fmt .
@@ -56,6 +56,8 @@ format:
 integration-test:
 	./k6 run examples/mqput.js
 
+integration-test-vus:
+	./k6 run -vu 20 --duration 60m examples/mqput.js
 
 ## test: Executes any unit tests.
 test:
