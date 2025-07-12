@@ -48,7 +48,9 @@ build:
 	CGO_ENABLED=1 \
 	CGO_LDFLAGS="-L${MQ_INSTALL_PATH}/lib64 -Wl,-rpath,${MQ_INSTALL_PATH}/lib64" \
 	CGO_CFLAGS="-I${MQ_INSTALL_PATH}/inc" \
-	xk6 build -v --skip-cleanup --with $(shell go list -m)=. --k6-version v1.0.0
+	xk6 build -v --skip-cleanup --with $(shell go list -m)=. --k6-version v1.0.0 \
+	&& ./k6 version
+
 ## format: Applies Go formatting to code.
 format:
 	go fmt .
