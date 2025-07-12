@@ -5,8 +5,9 @@ WORKDIR /build
 
 COPY . .
 
-RUN make build-mq
-RUN make build
+RUN make install-xk6 && \
+    make build-mq && \
+    make build
 
 FROM golang:1.24-bookworm
 
